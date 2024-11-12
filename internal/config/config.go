@@ -3,31 +3,70 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 )
 
 const configFileName = ".gatorconfig.json"
 
 type Config struct {
-	Db_url   string `json:"db_url"`
-	Username string `json:"current_user_name"`
+	DBURL           string `json:"db_url"`
+	CurrentUserName string `json:"current_user_name"`
 }
 
-func Read() Config {
-	homeDirectory, _ := os.UserHomeDir()
-	dat, _ := os.ReadFile(homeDirectory + "/.gatorconfig.json")
+func Read() (Config, error) {
+	fullPath, err := getConfigFilePath()
+	if err != nil {
+		return Config{}, err
+	}
+
+	file, err := os.Open(fullPath)
+	if err != nil {
+		return Config{}, err
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
 	cfg := Config{}
+	err = decoder.Decode(&cfg)
+	if err != nil {
+		return Config{}, err
+	}
 
-	json.Unmarshal(dat, &cfg)
-
-	return cfg
+	return cfg, nil
 }
 
-// in progress
-func (cfg Config) SetUser() {
-	os.WriteFile()
+func (cfg *Config) SetUser(userName string) error {
+	cfg.CurrentUserName = userName
+	return write(*cfg)
 }
 
 func getConfigFilePath() (string, error) {
 	homeDirectory, err := os.UserHomeDir()
-	return homeDirectory, err
+	if err != nil {
+		return "", err
+	}
+	fullPath := filepath.Join(homeDirectory, configFileName)
+	return fullPath, nil
+}
+
+func write(cfg Config) error {
+	fullpath, err := getConfigFilePath()
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(fullpath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
