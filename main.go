@@ -23,5 +23,6 @@ func main() {
 	}
 
 	fmt.Println(cfg.DBURL)
+	fmt.Println(cfg.CurrentUserName)
 
 }
