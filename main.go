@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/DavidLSaldana/gator/internal/config"
+	"github.com/DavidLSaldana/gator/internal/state"
 )
 
 func main() {
@@ -15,14 +16,12 @@ func main() {
 		return
 	}
 
-	cfg.SetUser("David")
-
-	cfg, err = config.Read()
-	if err != nil {
-		return
+	mainState := state.State{
+		Cfg: &cfg,
 	}
 
-	fmt.Println(cfg.DBURL)
-	fmt.Println(cfg.CurrentUserName)
+	//in progress
+	fmt.Println(mainState.Cfg.DBURL)
+	fmt.Println(mainState.Cfg.CurrentUserName)
 
 }

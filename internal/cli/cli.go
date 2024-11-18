@@ -37,6 +37,7 @@ func (c *commands) run(s *state.State, cmd command) error {
 	if !ok {
 		return errors.New("Please enter a valid command")
 	}
-	//in progress
+	//not sure about this, check it next run:
+	command(s, cmd)
 	return nil
 }
