@@ -7,12 +7,12 @@ import (
 	"github.com/DavidLSaldana/gator/internal/state"
 )
 
-type command struct {
+type Command struct {
 	name string
 	args []string
 }
 
-func handlerLogin(s *state.State, cmd command) error {
+func handlerLogin(s *state.State, cmd Command) error {
 	if (len(cmd.args) == 0) || (len(cmd.args) > 1) {
 		return errors.New("Command: Login expects a single argument username")
 	}
@@ -24,16 +24,16 @@ func handlerLogin(s *state.State, cmd command) error {
 	return nil
 }
 
-type commands struct {
-	commandMap map[string]func(*state.State, command) error
+type Commands struct {
+	CommandMap map[string]func(*state.State, Command) error
 }
 
-func (c *commands) register(name string, f func(*state.State, command) error) {
-	c.commandMap[name] = f
+func (c *Commands) Register(name string, f func(*state.State, Command) error) {
+	c.CommandMap[name] = f
 }
 
-func (c *commands) run(s *state.State, cmd command) error {
-	command, ok := c.commandMap[cmd.name]
+func (c *Commands) run(s *state.State, cmd Command) error {
+	command, ok := c.CommandMap[cmd.name]
 	if !ok {
 		return errors.New("Please enter a valid command")
 	}
