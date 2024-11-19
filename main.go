@@ -8,8 +8,6 @@ import (
 
 func main() {
 
-	cfg := config.Config{}
-
 	//error in read
 	cfg, err := config.Read()
 	if err != nil {
