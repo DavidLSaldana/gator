@@ -39,9 +39,21 @@ func Read() (Config, error) {
 	return cfg, nil
 }
 
+func (cfg Config) SetUser() error {
+	err := write(cfg)
+	if err != nil {
+		return err
+	}
+
+	//succussful write
+	return nil
+}
+
 // config file name:
 const configFileName string = ".gatorconfig.json"
 
+// checking that getConfigFilePath() doesn't get extra characters or have
+// missing characters can REMOVE
 func TestGetConfigPath() {
 	homePath, err := getConfigFilePath()
 	if err != nil {
@@ -60,8 +72,6 @@ func getConfigFilePath() (string, error) {
 	}
 
 	fullPath := homePath + "/" + configFileName
-
-	fmt.Printf("length of path: %d\n", len(fullPath))
 
 	return fullPath, nil
 }
