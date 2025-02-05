@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 )
 
 type Config struct {
@@ -12,9 +11,32 @@ type Config struct {
 	CurrentUserName string `json:"current_user_name"`
 }
 
-func Read() Config {
+func Read() (Config, error) {
+	//get file path
+	path, err := getConfigFilePath()
+	if err != nil {
+		return Config{}, err
+	}
 
-	return Config{}
+	//open file at path
+	file, err := os.Open(path)
+	if err != nil {
+		return Config{}, err
+	}
+
+	//defer to ensure file closes
+	defer file.Close()
+
+	//decode file into variable
+	//if error return Config{}, error
+	decoder := json.NewDecoder(file)
+	cfg := Config{}
+	err = decoder.Decode(&cfg)
+	if err != nil {
+		return Config{}, err
+	}
+
+	return cfg, nil
 }
 
 // config file name:
