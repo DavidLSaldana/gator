@@ -42,12 +42,32 @@ func Read() (Config, error) {
 // config file name:
 const configFileName string = ".gatorconfig.json"
 
+func TestGetConfigPath() {
+	homePath, err := getConfigFilePath()
+	if err != nil {
+		fmt.Println("ERROR")
+		return
+	}
+	fmt.Println(homePath)
+}
+
 // helper function for:
 // getting path to json/db file
 func getConfigFilePath() (string, error) {
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
 
-	return "", nil
+	fullPath := homePath + "/" + configFileName
+
+	fmt.Printf("length of path: %d\n", len(fullPath))
+
+	return fullPath, nil
 }
 
-//helper function for:
-//writing to json/db file
+// helper function for:
+// writing to json/db file
+func write(cfg Config) error {
+	return nil
+}

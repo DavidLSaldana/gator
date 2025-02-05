@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"github.com/DavidLSaldana/gator/internal/config"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+
+	config.TestGetConfigPath()
+
 }
