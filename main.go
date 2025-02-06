@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/DavidLSaldana/gator/internal/cli"
 	"github.com/DavidLSaldana/gator/internal/config"
 )
 
