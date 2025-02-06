@@ -1,0 +1,23 @@
+package main
+
+import (
+	"fmt"
+	"github.com/DavidLSaldana/gator/internal/config"
+)
+
+func main() {
+
+	//config.TestGetConfigPath()
+
+	currentUser := "david"
+
+	//read config file
+	cfg, err := config.Read()
+	if err != nil {
+		println(err)
+		return
+	}
+
+	cfg.SetUser(currentUser)
+
+}

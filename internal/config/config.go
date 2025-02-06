@@ -39,8 +39,11 @@ func Read() (Config, error) {
 	return cfg, nil
 }
 
-func (cfg Config) SetUser() error {
-	err := write(cfg)
+func (cfg *Config) SetUser(user string) error {
+
+	cfg.CurrentUserName = user
+
+	err := write(*cfg)
 	if err != nil {
 		return err
 	}
@@ -79,5 +82,27 @@ func getConfigFilePath() (string, error) {
 // helper function for:
 // writing to json/db file
 func write(cfg Config) error {
+	//get path to file
+	path, err := getConfigFilePath()
+	if err != nil {
+		return err
+	}
+
+	// create/open file
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	// close file for sure, since it is now open
+	defer file.Close()
+
+	// new encoder for json into the file
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(cfg)
+	if err != nil {
+		return err
+	}
+
+	//success
 	return nil
 }
