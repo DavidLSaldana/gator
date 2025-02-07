@@ -18,18 +18,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("Initial Read: %+v\n", cfg)
 
-	err = cfg.SetUser(currentUser)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	cfg, err = config.Read()
-	if err != nil {
-		fmt.Println(err)
-		return
+	currentState := &cli.State{
+		CfgPointer: &cfg,
 	}
 
 	fmt.Printf("Post SetUser Read: %+v\n", cfg)
