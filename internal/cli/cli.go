@@ -10,23 +10,23 @@ type State struct {
 	CfgPointer *config.Config
 }
 
-type command struct {
+type Command struct {
 	name string
 	args []string
 }
 
-type commands struct {
-	cmds map[string]func(*State, command) error
+type Commands struct {
+	Cmds map[string]func(*State, Command) error
 }
 
-// registers a new handler function for a command name
-func (c *commands) register(name string, f func(*State, command) error) {
-	c.cmds[name] = f
+// registers a new handler function for a Command name
+func (c *Commands) Register(name string, f func(*State, Command) error) {
+	c.Cmds[name] = f
 }
 
-// runs a given command with the provided state, if it exists
-func (c *commands) run(s *State, cmd command) error {
-	function, ok := c.cmds[cmd.name]
+// runs a given Command with the provided state, if it exists
+func (c *Commands) Run(s *State, cmd Command) error {
+	function, ok := c.Cmds[cmd.name]
 	if !ok {
 		return errors.New("cmd not found")
 	}
@@ -35,7 +35,7 @@ func (c *commands) run(s *State, cmd command) error {
 
 }
 
-func handlerLogin(s *State, cmd command) error {
+func HandlerLogin(s *State, cmd Command) error {
 	//login handler expects a single arg - the Username
 	if (len(cmd.args) == 0) || (len(cmd.args) > 1) {
 		return errors.New("error, expecting only username argument")
