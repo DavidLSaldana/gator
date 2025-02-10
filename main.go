@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -25,21 +24,32 @@ func main() {
 		CfgPointer: &cfg,
 	}
 
-	commands := cli.Commands{}
+	cmdList := make(map[string]func(*cli.State, cli.Command) error)
+
+	commands := cli.Commands{
+		Cmds: cmdList,
+	}
 
 	commands.Register("login", cli.HandlerLogin)
 
 	args := os.Args
 	if len(args) < 2 {
-		log.Fatalln("Error: incorrect number of arguments")
+		log.Fatalln("Error: not enough arguments provided")
 	}
 
 	commandName := args[1]
 	commandArgs := args[2:]
 
-	//this isn't working yet
-	//err := commands.Run(currentState, commands.commandName)
+	command := cli.Command{
+		Name: commandName,
+		Args: commandArgs,
+	}
 
-	fmt.Printf("Post SetUser Read: %+v\n", cfg)
+	err = commands.Run(currentState, command)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Printf("Current State: %+v\n", cfg)
 
 }

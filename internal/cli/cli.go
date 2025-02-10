@@ -11,8 +11,8 @@ type State struct {
 }
 
 type Command struct {
-	name string
-	args []string
+	Name string
+	Args []string
 }
 
 type Commands struct {
@@ -26,7 +26,7 @@ func (c *Commands) Register(name string, f func(*State, Command) error) {
 
 // runs a given Command with the provided state, if it exists
 func (c *Commands) Run(s *State, cmd Command) error {
-	function, ok := c.Cmds[cmd.name]
+	function, ok := c.Cmds[cmd.Name]
 	if !ok {
 		return errors.New("cmd not found")
 	}
@@ -37,16 +37,20 @@ func (c *Commands) Run(s *State, cmd Command) error {
 
 func HandlerLogin(s *State, cmd Command) error {
 	//login handler expects a single arg - the Username
-	if (len(cmd.args) == 0) || (len(cmd.args) > 1) {
+	if len(cmd.Args) > 1 {
 		return errors.New("error, expecting only username argument")
 	}
 
-	err := s.CfgPointer.SetUser(cmd.args[0])
+	if len(cmd.Args) == 0 {
+		return errors.New("error, a username is required")
+	}
+
+	err := s.CfgPointer.SetUser(cmd.Args[0])
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("User has been set to: %s\n", cmd.args[0])
+	fmt.Printf("User has been set to: %s\n", cmd.Args[0])
 
 	return nil
 }
