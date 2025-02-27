@@ -1,12 +1,19 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/DavidLSaldana/gator/internal/config"
+	"github.com/DavidLSaldana/gator/internal/database"
+	"github.com/google/uuid"
 )
 
 type State struct {
+	Db         *database.Queries
 	CfgPointer *config.Config
 }
 
@@ -45,12 +52,45 @@ func HandlerLogin(s *State, cmd Command) error {
 		return errors.New("error, a username is required")
 	}
 
-	err := s.CfgPointer.SetUser(cmd.Args[0])
+	_, err := s.Db.GetUser(context.Background(), cmd.Args[0])
+	if err != nil {
+		os.Exit(1)
+	}
+
+	err = s.CfgPointer.SetUser(cmd.Args[0])
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("User has been set to: %s\n", cmd.Args[0])
 
+	return nil
+}
+
+func HandlerRegister(s *State, cmd Command) error {
+	if len(cmd.Args) > 1 {
+		return errors.New("error, expecting only username argument")
+	}
+
+	if len(cmd.Args) == 0 {
+		return errors.New("error, a username is required")
+	}
+
+	newID := uuid.New()
+
+	args := database.CreateUserParams{
+		ID:        int32(newID.ID()),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      cmd.Args[0],
+	}
+	fmt.Println("The code makes it here!")
+	newUser, err := s.Db.CreateUser(context.Background(), args)
+	if err != nil {
+		os.Exit(1)
+	}
+
+	s.CfgPointer.CurrentUserName = newUser.Name
+	fmt.Printf("New User: %s, has been created!\n", s.CfgPointer.CurrentUserName)
 	return nil
 }
