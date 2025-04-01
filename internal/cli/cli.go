@@ -63,6 +63,7 @@ func HandlerLogin(s *State, cmd Command) error {
 	}
 
 	fmt.Printf("User has been set to: %s\n", cmd.Args[0])
+	fmt.Printf("This has happened")
 
 	return nil
 }
@@ -92,5 +93,43 @@ func HandlerRegister(s *State, cmd Command) error {
 
 	s.CfgPointer.CurrentUserName = newUser.Name
 	fmt.Printf("New User: %s, has been created!\n", s.CfgPointer.CurrentUserName)
+	err = s.CfgPointer.SetUser(newUser.Name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func HandlerReset(s *State, cmd Command) error {
+	if len(cmd.Args) != 0 {
+		return errors.New("not expecting any arguments for 'reset' command")
+	}
+
+	err := s.Db.ResetUsers(context.Background())
+	if err != nil {
+		os.Exit(1)
+	}
+
+	return nil
+}
+
+func HandlerUsers(s *State, cmd Command) error {
+	if len(cmd.Args) != 0 {
+		return errors.New("not expecting any arguments for 'users' command")
+	}
+
+	listOfUsers, err := s.Db.GetUsers(context.Background())
+	if err != nil {
+		return err
+	}
+
+	for _, user := range listOfUsers {
+		if user == s.CfgPointer.CurrentUserName {
+			fmt.Printf("* %s (current)\n", user)
+		} else {
+			fmt.Printf("* %s\n", user)
+		}
+	}
+
 	return nil
 }
