@@ -3,6 +3,7 @@ package rss
 import (
 	"context"
 	"encoding/xml"
+	"html"
 	"io"
 	"net/http"
 )
@@ -30,15 +31,15 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 
 	//figuring this out. expecting errors here. Things worked before, so start
 	//looking in all of this function below
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, feedURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
 	if err != nil {
 		return rssFeedPtr, err
 	}
 
-	newClient := http.Client{}
+	client := http.Client{}
 	req.Header.Set(req.UserAgent(), "gator")
 
-	resp, err := newClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return rssFeedPtr, err
 	}
@@ -53,5 +54,18 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 		return rssFeedPtr, err
 	}
 
+	rssFeedPtr = cleanup(rssFeedPtr)
+
 	return rssFeedPtr, nil
+}
+
+// decode escaped HTML from entire feed
+func cleanup(rssFeed *RSSFeed) *RSSFeed {
+	rssFeed.Channel.Title = html.UnescapeString(rssFeed.Channel.Title)
+	rssFeed.Channel.Description = html.UnescapeString(rssFeed.Channel.Description)
+	for i := range rssFeed.Channel.Item {
+		rssFeed.Channel.Item[i].Title = html.UnescapeString(rssFeed.Channel.Item[i].Title)
+		rssFeed.Channel.Item[i].Description = html.UnescapeString(rssFeed.Channel.Item[i].Description)
+	}
+	return rssFeed
 }
