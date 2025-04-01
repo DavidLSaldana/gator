@@ -3,6 +3,7 @@ package rss
 import (
 	"context"
 	"encoding/xml"
+	"fmt"
 	"html"
 	"io"
 	"net/http"
@@ -24,7 +25,7 @@ type RSSItem struct {
 	PubDate     string `xml:"pubDate"`
 }
 
-func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
+func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 
 	feed := RSSFeed{}
 	rssFeedPtr := &feed
@@ -36,13 +37,18 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 		return rssFeedPtr, err
 	}
 
+	fmt.Println("This is happening - 1")
 	client := http.Client{}
 	req.Header.Set(req.UserAgent(), "gator")
+	fmt.Println("This is happening - 2")
 
+	fmt.Println("This is happening - 3")
+	//error on do request, invalid header ""
 	resp, err := client.Do(req)
 	if err != nil {
 		return rssFeedPtr, err
 	}
+	fmt.Println("This is happening - 4")
 
 	reader, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -54,9 +60,7 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 		return rssFeedPtr, err
 	}
 
-	rssFeedPtr = cleanup(rssFeedPtr)
-
-	return rssFeedPtr, nil
+	return cleanup(rssFeedPtr), nil
 }
 
 // decode escaped HTML from entire feed

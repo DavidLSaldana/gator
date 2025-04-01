@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/DavidLSaldana/gator/internal/config"
 	"github.com/DavidLSaldana/gator/internal/database"
+	"github.com/DavidLSaldana/gator/internal/rss"
 	"github.com/google/uuid"
 )
 
@@ -129,6 +131,28 @@ func HandlerUsers(s *State, cmd Command) error {
 		} else {
 			fmt.Printf("* %s\n", user)
 		}
+	}
+
+	return nil
+}
+
+func HandlerAgg(s *State, cmd Command) error {
+	feed := &rss.RSSFeed{}
+	url := "https://www.wagslane.dev/index.xml"
+	feed, err := rss.FetchFeed(context.Background(), url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("RSSFeed Title: %s", feed.Channel.Title)
+	fmt.Printf("RSSFeed Link: %s", feed.Channel.Link)
+	fmt.Printf("RSSFeed Description: %s", feed.Channel.Description)
+
+	for _, item := range feed.Channel.Item {
+		fmt.Printf("Item Title: %s", item.Title)
+		fmt.Printf("Item Link: %s", item.Link)
+		fmt.Printf("Item Description: %s", item.Description)
+		fmt.Printf("Item Publish Date: %s", item.PubDate)
 	}
 
 	return nil
