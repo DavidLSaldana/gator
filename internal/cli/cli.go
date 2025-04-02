@@ -144,15 +144,15 @@ func HandlerAgg(s *State, cmd Command) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("RSSFeed Title: %s", feed.Channel.Title)
-	fmt.Printf("RSSFeed Link: %s", feed.Channel.Link)
-	fmt.Printf("RSSFeed Description: %s", feed.Channel.Description)
+	fmt.Printf("RSSFeed Title: %s\n", feed.Channel.Title)
+	fmt.Printf("RSSFeed Link: %s\n", feed.Channel.Link)
+	fmt.Printf("RSSFeed Description: %s\n", feed.Channel.Description)
 
 	for _, item := range feed.Channel.Item {
-		fmt.Printf("Item Title: %s", item.Title)
-		fmt.Printf("Item Link: %s", item.Link)
-		fmt.Printf("Item Description: %s", item.Description)
-		fmt.Printf("Item Publish Date: %s", item.PubDate)
+		fmt.Printf("Item Title: %s\n", item.Title)
+		fmt.Printf("Item Link: %s\n", item.Link)
+		fmt.Printf("Item Description: %s\n", item.Description)
+		fmt.Printf("Item Publish Date: %s\n\n", item.PubDate)
 	}
 
 	return nil

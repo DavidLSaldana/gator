@@ -3,7 +3,6 @@ package rss
 import (
 	"context"
 	"encoding/xml"
-	"fmt"
 	"html"
 	"io"
 	"net/http"
@@ -37,18 +36,15 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 		return rssFeedPtr, err
 	}
 
-	fmt.Println("This is happening - 1")
 	client := http.Client{}
-	req.Header.Set(req.UserAgent(), "gator")
-	fmt.Println("This is happening - 2")
+	req.Header.Set("User-Agent", "gator")
 
-	fmt.Println("This is happening - 3")
 	//error on do request, invalid header ""
 	resp, err := client.Do(req)
 	if err != nil {
 		return rssFeedPtr, err
 	}
-	fmt.Println("This is happening - 4")
+	defer resp.Body.Close()
 
 	reader, err := io.ReadAll(resp.Body)
 	if err != nil {
