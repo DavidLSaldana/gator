@@ -54,18 +54,17 @@ func HandlerLogin(s *State, cmd Command) error {
 		return errors.New("error, a username is required")
 	}
 
-	_, err := s.Db.GetUser(context.Background(), cmd.Args[0])
+	user, err := s.Db.GetUser(context.Background(), cmd.Args[0])
 	if err != nil {
 		os.Exit(1)
 	}
 	//want to update to include the user id in config struct **HERE**
-	err = s.CfgPointer.SetUser(cmd.Args[0])
+	err = s.CfgPointer.SetUser(user)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("User has been set to: %s\n", cmd.Args[0])
-	fmt.Printf("This has happened")
 
 	return nil
 }
@@ -92,9 +91,8 @@ func HandlerRegister(s *State, cmd Command) error {
 		os.Exit(1)
 	}
 
-	s.CfgPointer.CurrentUserName = newUser.Name
 	fmt.Printf("New User: %s, has been created!\n", s.CfgPointer.CurrentUserName)
-	err = s.CfgPointer.SetUser(newUser.Name, newUser.ID)
+	err = s.CfgPointer.SetUser(newUser)
 	if err != nil {
 		return err
 	}
@@ -161,20 +159,19 @@ func handlerAddFeed(s *State, cmd Command) error {
 	if len(cmd.Args) != 4 {
 		return errors.New("need a name for the feed and a URL for the feed, nothing more and nothing less")
 	}
-	currentUser := s.CfgPointer.CurrentUserName
 	currentTime := time.Now()
 	newID := uuid.New()
 
 	args := database.CreateFeedParams{
-		ID:        int32(NewID.ID()),
+		ID:        int32(newID.ID()),
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
 		Name:      cmd.Args[2],
 		Url:       cmd.Args[3],
-		UserID:    s.CfgPointer.CurrentUserName,
+		UserID:    s.CfgPointer.CurrentUserID,
 	}
-	// working here
-	//_, err := database.CreateFeed(
+	// ***HERE***
+	_, err := CreateFeed(context.Background(), args)
 
 	return nil
 }

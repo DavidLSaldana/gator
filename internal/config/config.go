@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/DavidLSaldana/gator/internal/database"
 )
 
 type Config struct {
 	DBURL           string `json:"db_url"`
 	CurrentUserName string `json:"current_user_name"`
-	CurrentUserID   int    `json:"current_user_id"`
+	CurrentUserID   int32  `json:"current_user_id"`
 }
 
 func Read() (Config, error) {
@@ -40,10 +42,10 @@ func Read() (Config, error) {
 	return cfg, nil
 }
 
-func (cfg *Config) SetUser(user string, id int32) error {
+func (cfg *Config) SetUser(user database.User) error {
 
-	cfg.CurrentUserName = user
-	cfg.CurrentUserID = id
+	cfg.CurrentUserName = user.Name
+	cfg.CurrentUserID = user.ID
 
 	err := write(*cfg)
 	if err != nil {
