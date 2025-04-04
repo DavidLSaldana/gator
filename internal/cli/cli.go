@@ -58,7 +58,7 @@ func HandlerLogin(s *State, cmd Command) error {
 	if err != nil {
 		os.Exit(1)
 	}
-
+	//want to update to include the user id in config struct **HERE**
 	err = s.CfgPointer.SetUser(cmd.Args[0])
 	if err != nil {
 		return err
@@ -87,7 +87,6 @@ func HandlerRegister(s *State, cmd Command) error {
 		UpdatedAt: time.Now(),
 		Name:      cmd.Args[0],
 	}
-	fmt.Println("The code makes it here!")
 	newUser, err := s.Db.CreateUser(context.Background(), args)
 	if err != nil {
 		os.Exit(1)
@@ -95,7 +94,7 @@ func HandlerRegister(s *State, cmd Command) error {
 
 	s.CfgPointer.CurrentUserName = newUser.Name
 	fmt.Printf("New User: %s, has been created!\n", s.CfgPointer.CurrentUserName)
-	err = s.CfgPointer.SetUser(newUser.Name)
+	err = s.CfgPointer.SetUser(newUser.Name, newUser.ID)
 	if err != nil {
 		return err
 	}
@@ -164,8 +163,17 @@ func handlerAddFeed(s *State, cmd Command) error {
 	}
 	currentUser := s.CfgPointer.CurrentUserName
 	currentTime := time.Now()
+	newID := uuid.New()
 
-	//in progress continue here
+	args := database.CreateFeedParams{
+		ID:        int32(NewID.ID()),
+		CreatedAt: currentTime,
+		UpdatedAt: currentTime,
+		Name:      cmd.Args[2],
+		Url:       cmd.Args[3],
+		UserID:    s.CfgPointer.CurrentUserName,
+	}
+	// working here
 	//_, err := database.CreateFeed(
 
 	return nil
