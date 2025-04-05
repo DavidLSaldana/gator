@@ -155,8 +155,8 @@ func HandlerAgg(s *State, cmd Command) error {
 	return nil
 }
 
-func handlerAddFeed(s *State, cmd Command) error {
-	if len(cmd.Args) != 4 {
+func HandlerAddFeed(s *State, cmd Command) error {
+	if len(cmd.Args) != 2 {
 		return errors.New("need a name for the feed and a URL for the feed, nothing more and nothing less")
 	}
 	currentTime := time.Now()
@@ -166,12 +166,14 @@ func handlerAddFeed(s *State, cmd Command) error {
 		ID:        int32(newID.ID()),
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
-		Name:      cmd.Args[2],
-		Url:       cmd.Args[3],
+		Name:      cmd.Args[0],
+		Url:       cmd.Args[1],
 		UserID:    s.CfgPointer.CurrentUserID,
 	}
-	// ***HERE***
-	_, err := CreateFeed(context.Background(), args)
+	_, err := s.Db.CreateFeed(context.Background(), args)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
