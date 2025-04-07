@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -15,9 +14,6 @@ import _ "github.com/lib/pq"
 
 func main() {
 
-	//config.TestGetConfigPath()
-
-	//read config file
 	cfg, err := config.Read()
 	if err != nil {
 		log.Fatalln(err)
@@ -47,6 +43,7 @@ func main() {
 	commands.Register("users", cli.HandlerUsers)
 	commands.Register("agg", cli.HandlerAgg)
 	commands.Register("addfeed", cli.HandlerAddFeed)
+	commands.Register("feeds", cli.HandlerFeeds)
 
 	args := os.Args
 	if len(args) < 2 {
@@ -65,7 +62,5 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	fmt.Printf("Current State: %+v\n", cfg)
 
 }

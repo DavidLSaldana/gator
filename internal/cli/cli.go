@@ -91,7 +91,6 @@ func HandlerRegister(s *State, cmd Command) error {
 		os.Exit(1)
 	}
 
-	fmt.Printf("New User: %s, has been created!\n", s.CfgPointer.CurrentUserName)
 	err = s.CfgPointer.SetUser(newUser)
 	if err != nil {
 		return err
@@ -173,6 +172,29 @@ func HandlerAddFeed(s *State, cmd Command) error {
 	_, err := s.Db.CreateFeed(context.Background(), args)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func HandlerFeeds(s *State, cmd Command) error {
+	feeds, err := s.Db.GetFeeds(context.Background())
+	if err != nil {
+		return err
+	}
+
+	if len(feeds) == 0 {
+		return errors.New("There are no feeds to show")
+	}
+
+	for _, feed := range feeds {
+		fmt.Printf("Name: %s\n", feed.Name)
+		fmt.Printf("URL: %s\n", feed.Url)
+		owner, err := s.Db.GetUserNameFromID(context.Background(), feed.UserID)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Owner: %s\n", owner)
 	}
 
 	return nil
