@@ -207,6 +207,9 @@ func HandlerFollow(s *State, cmd Command) error {
 	}
 	currentTime := time.Now()
 
+	//need to write a query for getting feedID with a URL arg
+	//Written! Need to generate with SQLC aftwerward, can remove these comments
+	//feedID := getFeedId(cmd.Args[0])
 	newID := uuid.New()
 	args := database.CreateFeedParams{
 		ID:        int32(newID.ID()),
@@ -214,7 +217,10 @@ func HandlerFollow(s *State, cmd Command) error {
 		UpdatedAt: currentTime,
 		Url:       cmd.Args[0],
 		UserID:    s.CfgPointer.CurrentUserID,
+		//feedID:    feedID,
 	}
+
+	feedFollow, err := s.Db.CreateFeedFollow(context.Background(), args)
 
 	return nil
 }
