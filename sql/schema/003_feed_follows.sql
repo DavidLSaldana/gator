@@ -1,4 +1,4 @@
--- goose Up
+-- +goose Up
 CREATE TABLE feed_follows(
 	id INT PRIMARY KEY,
 	created_at TIMESTAMP NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE feed_follows(
 	UNIQUE (user_id, feed_id)
 );
 
--- goose Down
+-- +goose Down
 DROP TABLE feed_follows;

@@ -199,3 +199,22 @@ func HandlerFeeds(s *State, cmd Command) error {
 
 	return nil
 }
+
+// leaving off here
+func HandlerFollow(s *State, cmd Command) error {
+	if len(cmd.Args) != 1 {
+		return errors.New("follow only takes a single url argument")
+	}
+	currentTime := time.Now()
+
+	newID := uuid.New()
+	args := database.CreateFeedParams{
+		ID:        int32(newID.ID()),
+		CreatedAt: currentTime,
+		UpdatedAt: currentTime,
+		Url:       cmd.Args[0],
+		UserID:    s.CfgPointer.CurrentUserID,
+	}
+
+	return nil
+}
