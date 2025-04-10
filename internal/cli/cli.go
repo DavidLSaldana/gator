@@ -133,7 +133,7 @@ func HandlerUsers(s *State, cmd Command) error {
 }
 
 func HandlerAgg(s *State, cmd Command) error {
-	feed := &rss.RSSFeed{}
+	//	feed := &rss.RSSFeed{}
 	url := "https://www.wagslane.dev/index.xml"
 	feed, err := rss.FetchFeed(context.Background(), url)
 	if err != nil {
@@ -169,7 +169,21 @@ func HandlerAddFeed(s *State, cmd Command) error {
 		Url:       cmd.Args[1],
 		UserID:    s.CfgPointer.CurrentUserID,
 	}
-	_, err := s.Db.CreateFeed(context.Background(), args)
+	newFeed, err := s.Db.CreateFeed(context.Background(), args)
+	if err != nil {
+		return err
+	}
+
+	newID = uuid.New()
+	feedFollowArgs := database.CreateFeedFollowParams{
+		ID:        int32(newID.ID()),
+		CreatedAt: currentTime,
+		UpdatedAt: currentTime,
+		UserID:    s.CfgPointer.CurrentUserID,
+		FeedID:    newFeed.ID,
+	}
+
+	_, err = s.Db.CreateFeedFollow(context.Background(), feedFollowArgs)
 	if err != nil {
 		return err
 	}
@@ -200,27 +214,47 @@ func HandlerFeeds(s *State, cmd Command) error {
 	return nil
 }
 
-// leaving off here
 func HandlerFollow(s *State, cmd Command) error {
 	if len(cmd.Args) != 1 {
 		return errors.New("follow only takes a single url argument")
 	}
 	currentTime := time.Now()
 
-	//need to write a query for getting feedID with a URL arg
-	//Written! Need to generate with SQLC aftwerward, can remove these comments
-	//feedID := getFeedId(cmd.Args[0])
+	feedID, err := s.Db.GetFeedID(context.Background(), cmd.Args[0])
+	if err != nil {
+		return err
+	}
 	newID := uuid.New()
-	args := database.CreateFeedParams{
+	args := database.CreateFeedFollowParams{
 		ID:        int32(newID.ID()),
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
-		Url:       cmd.Args[0],
 		UserID:    s.CfgPointer.CurrentUserID,
-		//feedID:    feedID,
+		FeedID:    feedID,
 	}
 
-	feedFollow, err := s.Db.CreateFeedFollow(context.Background(), args)
+	_, err = s.Db.CreateFeedFollow(context.Background(), args)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func HandlerFollowing(s *State, cmd Command) error {
+	if len(cmd.Args) > 0 {
+		return errors.New("following works on current user, doesn't take any additional arguments")
+	}
+
+	feedFollows, err := s.Db.GetFeedFollowsForUser(context.Background(), s.CfgPointer.CurrentUserID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Current feeds that %s follows:\n", s.CfgPointer.CurrentUserName)
+	for _, feedFollow := range feedFollows {
+		fmt.Printf(" - %s\n", feedFollow.FeedName)
+	}
 
 	return nil
 }

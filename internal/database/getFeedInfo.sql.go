@@ -9,6 +9,19 @@ import (
 	"context"
 )
 
+const getFeedID = `-- name: GetFeedID :one
+
+SELECT id from feeds
+WHERE url = $1
+`
+
+func (q *Queries) GetFeedID(ctx context.Context, url string) (int32, error) {
+	row := q.db.QueryRowContext(ctx, getFeedID, url)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getFeedInfo = `-- name: GetFeedInfo :one
 SELECT id, created_at, updated_at, name, url, user_id from feeds
 WHERE id = $1
