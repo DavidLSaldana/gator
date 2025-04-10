@@ -58,7 +58,6 @@ func HandlerLogin(s *State, cmd Command) error {
 	if err != nil {
 		os.Exit(1)
 	}
-	//want to update to include the user id in config struct **HERE**
 	err = s.CfgPointer.SetUser(user)
 	if err != nil {
 		return err
@@ -154,7 +153,7 @@ func HandlerAgg(s *State, cmd Command) error {
 	return nil
 }
 
-func HandlerAddFeed(s *State, cmd Command) error {
+func HandlerAddFeed(s *State, cmd Command, user database.User) error {
 	if len(cmd.Args) != 2 {
 		return errors.New("need a name for the feed and a URL for the feed, nothing more and nothing less")
 	}
@@ -214,7 +213,7 @@ func HandlerFeeds(s *State, cmd Command) error {
 	return nil
 }
 
-func HandlerFollow(s *State, cmd Command) error {
+func HandlerFollow(s *State, cmd Command, user database.User) error {
 	if len(cmd.Args) != 1 {
 		return errors.New("follow only takes a single url argument")
 	}
@@ -241,7 +240,7 @@ func HandlerFollow(s *State, cmd Command) error {
 	return nil
 }
 
-func HandlerFollowing(s *State, cmd Command) error {
+func HandlerFollowing(s *State, cmd Command, user database.User) error {
 	if len(cmd.Args) > 0 {
 		return errors.New("following works on current user, doesn't take any additional arguments")
 	}
@@ -257,4 +256,12 @@ func HandlerFollowing(s *State, cmd Command) error {
 	}
 
 	return nil
+}
+
+middlewareLoggedIn(handler func(s *State, cmd Command, user database.User) error) func (*State, Command) error {
+
+	//figuring this out
+	//handler(
+	//return 
+
 }
