@@ -166,7 +166,7 @@ func HandlerAddFeed(s *State, cmd Command, user database.User) error {
 		UpdatedAt: currentTime,
 		Name:      cmd.Args[0],
 		Url:       cmd.Args[1],
-		UserID:    s.CfgPointer.CurrentUserID,
+		UserID:    user.ID,
 	}
 	newFeed, err := s.Db.CreateFeed(context.Background(), args)
 	if err != nil {
@@ -178,7 +178,7 @@ func HandlerAddFeed(s *State, cmd Command, user database.User) error {
 		ID:        int32(newID.ID()),
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
-		UserID:    s.CfgPointer.CurrentUserID,
+		UserID:    user.ID,
 		FeedID:    newFeed.ID,
 	}
 
@@ -228,7 +228,7 @@ func HandlerFollow(s *State, cmd Command, user database.User) error {
 		ID:        int32(newID.ID()),
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
-		UserID:    s.CfgPointer.CurrentUserID,
+		UserID:    user.ID,
 		FeedID:    feedID,
 	}
 
@@ -245,7 +245,7 @@ func HandlerFollowing(s *State, cmd Command, user database.User) error {
 		return errors.New("following works on current user, doesn't take any additional arguments")
 	}
 
-	feedFollows, err := s.Db.GetFeedFollowsForUser(context.Background(), s.CfgPointer.CurrentUserID)
+	feedFollows, err := s.Db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return err
 	}
@@ -258,10 +258,12 @@ func HandlerFollowing(s *State, cmd Command, user database.User) error {
 	return nil
 }
 
-middlewareLoggedIn(handler func(s *State, cmd Command, user database.User) error) func (*State, Command) error {
-
-	//figuring this out
-	//handler(
-	//return 
-
+func MiddlewareLoggedIn(handler func(s *State, cmd Command, user database.User) error) func(*State, Command) error {
+	return func(s *State, cmd Command) error {
+		user, err := s.Db.GetUser(context.Background(), s.CfgPointer.CurrentUserName)
+		if err != nil {
+			return err
+		}
+		return handler(s, cmd, user)
+	}
 }
