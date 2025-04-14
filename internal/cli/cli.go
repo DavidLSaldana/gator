@@ -240,6 +240,14 @@ func HandlerFollow(s *State, cmd Command, user database.User) error {
 	return nil
 }
 
+func HandlerUnfollow(s *State, cmd Command, user database.User) error {
+	if len(cmd.Args) != 1 {
+		return errors.New("unfollow only takes a single url argument")
+	}
+
+	return nil
+}
+
 func HandlerFollowing(s *State, cmd Command, user database.User) error {
 	if len(cmd.Args) > 0 {
 		return errors.New("following works on current user, doesn't take any additional arguments")
