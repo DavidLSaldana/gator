@@ -244,6 +244,19 @@ func HandlerUnfollow(s *State, cmd Command, user database.User) error {
 	if len(cmd.Args) != 1 {
 		return errors.New("unfollow only takes a single url argument")
 	}
+	feedID, err := s.Db.GetFeedID(context.Background(), cmd.Args[0])
+	if err != nil {
+		return err
+	}
+
+	args := database.DeleteFeedFollowParams{
+		UserID: user.ID,
+		FeedID: feedID,
+	}
+	err = s.Db.DeleteFeedFollow(context.Background(), args)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
