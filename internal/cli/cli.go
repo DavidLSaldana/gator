@@ -133,25 +133,21 @@ func HandlerUsers(s *State, cmd Command) error {
 }
 
 func HandlerAgg(s *State, cmd Command) error {
-	//	feed := &rss.RSSFeed{}
-	url := "https://www.wagslane.dev/index.xml"
-	feed, err := rss.FetchFeed(context.Background(), url)
+	if len(cmd.Args) != 1 {
+		return errors.New("agg command only takes a single time duration argument")
+	}
+
+	time_between_reqs, err := time.ParseDuration(cmd.Args[0])
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	fmt.Printf("RSSFeed Title: %s\n", feed.Channel.Title)
-	fmt.Printf("RSSFeed Link: %s\n", feed.Channel.Link)
-	fmt.Printf("RSSFeed Description: %s\n", feed.Channel.Description)
+	fmt.Printf("Collecting feeds every %s\n", cmd.Args[0])
 
-	for _, item := range feed.Channel.Item {
-		fmt.Printf("Item Title: %s\n", item.Title)
-		fmt.Printf("Item Link: %s\n", item.Link)
-		fmt.Printf("Item Description: %s\n", item.Description)
-		fmt.Printf("Item Publish Date: %s\n\n", item.PubDate)
+	ticker := time.NewTicker(time_between_reqs)
+	for ; ; <-ticker.C {
+		ScrapeFeeds(s)
 	}
-
-	return nil
 }
 
 func HandlerAddFeed(s *State, cmd Command, user database.User) error {
@@ -311,7 +307,21 @@ func ScrapeFeeds(s *State) error {
 		return err
 	}
 
-	//leaving off here
+	feed, err := rss.FetchFeed(context.Background(), nextFeed.Url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("RSSFeed Title: %s\n", feed.Channel.Title)
+	//fmt.Printf("RSSFeed Link: %s\n", feed.Channel.Link)
+	//fmt.Printf("RSSFeed Description: %s\n", feed.Channel.Description)
+
+	for _, item := range feed.Channel.Item {
+		fmt.Printf("Item Title: %s\n", item.Title)
+		//	fmt.Printf("Item Link: %s\n", item.Link)
+		//	fmt.Printf("Item Description: %s\n", item.Description)
+		//	fmt.Printf("Item Publish Date: %s\n\n", item.PubDate)
+	}
 
 	return nil
 }
