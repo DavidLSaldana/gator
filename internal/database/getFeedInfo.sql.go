@@ -23,7 +23,7 @@ func (q *Queries) GetFeedID(ctx context.Context, url string) (int32, error) {
 }
 
 const getFeedInfo = `-- name: GetFeedInfo :one
-SELECT id, created_at, updated_at, name, url, user_id from feeds
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at from feeds
 WHERE id = $1
 `
 
@@ -37,6 +37,7 @@ func (q *Queries) GetFeedInfo(ctx context.Context, id int32) (Feed, error) {
 		&i.Name,
 		&i.Url,
 		&i.UserID,
+		&i.LastFetchedAt,
 	)
 	return i, err
 }

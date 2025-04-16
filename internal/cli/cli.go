@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -287,4 +288,30 @@ func MiddlewareLoggedIn(handler func(s *State, cmd Command, user database.User) 
 		}
 		return handler(s, cmd, user)
 	}
+}
+
+func ScrapeFeeds(s *State) error {
+	nextFeed, err := s.Db.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return err
+	}
+
+	currentTime := sql.NullTime{
+		Time:  time.Now(),
+		Valid: true,
+	}
+
+	markFeedFetchedParams := database.MarkFeedFetchedParams{
+		ID:            nextFeed.ID,
+		LastFetchedAt: currentTime,
+	}
+
+	err = s.Db.MarkFeedFetched(context.Background(), markFeedFetchedParams)
+	if err != nil {
+		return err
+	}
+
+	//leaving off here
+
+	return nil
 }
