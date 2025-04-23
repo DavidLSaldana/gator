@@ -312,16 +312,51 @@ func ScrapeFeeds(s *State) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("RSSFeed Title: %s\n", feed.Channel.Title)
+	//fmt.Printf("RSSFeed Title: %s\n", feed.Channel.Title)
 	//fmt.Printf("RSSFeed Link: %s\n", feed.Channel.Link)
 	//fmt.Printf("RSSFeed Description: %s\n", feed.Channel.Description)
 
-	for _, item := range feed.Channel.Item {
-		fmt.Printf("Item Title: %s\n", item.Title)
+	for _, post := range feed.Channel.Item {
+		err := savePost(s, post, feed.ID)
+		if err != nil {
+			return err
+		}
+		//	fmt.Printf("Item Title: %s\n", item.Title)
 		//	fmt.Printf("Item Link: %s\n", item.Link)
 		//	fmt.Printf("Item Description: %s\n", item.Description)
 		//	fmt.Printf("Item Publish Date: %s\n\n", item.PubDate)
 	}
 
+	return nil
+}
+
+// leaving off here
+
+func savePost(s *State, feedItem rss.RSSItem, feedID int32) error {
+	newID := uuid.New()
+	currentTime := time.Now()
+
+	feedDescription := sql.NullString{}
+	feedDescription.String = feedItem.Description
+	if feedItem.Description != "" {
+		feedDescription.Valid = true
+	} else {
+		feedDescription.Valid = false
+	}
+
+	feedPublishedTime := sql.NullTime{}
+	//leaving off here
+
+	args := database.CreatePostParams{
+		ID:          int32(newID.ID()),
+		CreatedAt:   currentTime,
+		UpdatedAt:   currentTime,
+		Title:       feedItem.Title,
+		Url:         feedItem.Link,
+		Description: feedDescription,
+		PublishedAt: feedItem.PubDate,
+		FeedID:      feedID,
+	}
+	s.Db.CreatePost()
 	return nil
 }
